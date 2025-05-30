@@ -34,3 +34,4 @@
 - [UMD CTF 2025](https://github.com/halexys/UciTeam1/tree/main/UMDCTF_2025)
 - [UniVsThreats_CTF_2025](https://github.com/halexys/UciTeam1/tree/main/UniVsThreats_CTF_2025)
 - [DAM_CTF_2025](https://github.com/halexys/UciTeam1/tree/main/DAM_CTF_2025)
+- [Nahamcom_CTF_2025](https://github.com/halexys/UciTeam1/tree/main/Nahamcon_CTF_2025)
