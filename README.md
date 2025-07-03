@@ -35,3 +35,4 @@
 - [UniVsThreats_CTF_2025](https://github.com/Calana2/CTF_Writeups/tree/main/UniVsThreats_CTF_2025)
 - [DAM_CTF_2025](https://github.com/Calana2/CTF_Writeups/tree/main/DAM_CTF_2025)
 - [Nahamcom_CTF_2025](https://github.com/Calana2/CTF_Writeups/tree/main/Nahamcom_CTF_2025)
+- [Junior_Crypt_CTF_2025](https://github.com/Calana2/CTF_Writeups/tree/main/Junior_Crypt_CTF_2025)
