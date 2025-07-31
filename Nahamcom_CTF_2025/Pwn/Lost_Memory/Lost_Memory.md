@@ -1,8 +1,8 @@
 # Lost Memory
 
-Con lo poco que sabia yo de heap explotation no me dio para resolver estos retos, pero aprendí un montón estudiando las soluciones de otros,
+Con lo poco que sabia yo de heap explotation no me dio para resolver estos retos, pero aprendí un montón estudiando las soluciones de los demas.
 
-En este reto podiamos, asignar memoria dinamicamente, escribir y liberar. Tambien podiamos escribir una direccion del stack, RSP - 0x20 en el heap y leer su contenido, pero solo podiamos leer en esta accion.
+En este reto podiamos asignar memoria dinamicamente, escribir y liberar. Tambien podiamos escribir una direccion del stack, RSP - 0x20 en el heap y leer su contenido, pero solo podiamos leer en esta accion.
 
 Aqui hay que tener un poco de conocimiento de como funciona el heap: los chunks, las bins, tcache, hooks...
 
@@ -41,7 +41,7 @@ Cuando un chunk esta asignado los campos bkr y fd son usados como data asi que s
 
 Cuando un chunk es liberado entonces bkr(backward pinter) apunta al chunk libre anterior en la lista y fd(forward pointer) apunta al siguiente chunk libre en la lista. Esto ocurre en algunas bins si no me equivoco en algunas bins y en el tcache.
 
-El chunk que asignamos y liberamos va al tcache, una estructura LIFO de donde se toman chunks para ser reasignados si tienen un tamaño similar a proximas asignaciones. El tcache luce asi ahoraÑ
+El chunk que asignamos y liberamos va al tcache, una estructura LIFO de donde se toman chunks para ser reasignados si tienen un tamaño similar a proximas asignaciones. El tcache luce asi ahora:
 ```
 tcache -> chunk1 -> NULL
                  fd
