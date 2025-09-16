@@ -134,12 +134,12 @@ Este bloque hace que el hilo principal duerma por 777 milisegundos, luego desact
 
 En resumen `uc=13` siempre y `ac=777000000/1000/7000=111` aproximadamente. 
 
-Bueno, deberia ser asi pero en mis pruebas era `ac=0` siempre. Una posible explicacion puede ser [esta](https://stackoverflow.com/questions/64217976/sigalrm-in-c-does-not-executing-in-the-handler)
+Bueno, deberia ser asi pero en mis pruebas era `ac=0` siempre. Una posible explicacion puede ser [esta](https://stackoverflow.com/questions/64217976/sigalrm-in-c-does-not-executing-in-the-handler).
 
 <img width="736" height="265" alt="2025-09-16-175807_736x265_scrot" src="https://github.com/user-attachments/assets/fa7d70d5-4271-43d8-b79a-78747f5f5322" />
 
 ### Exploit
-```
+```py
 #!/usr/bin/env python3
 
 from pwn import *
