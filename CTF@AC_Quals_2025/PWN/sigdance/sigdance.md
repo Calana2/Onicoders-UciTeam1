@@ -58,7 +58,7 @@ Este bloque asegura que el hilo actual pueda recibir `SIGALRM` y `SIGUSR1`
 ```
 
 
-`void *memset(void s[.n], int c, size_t n);` llena los primeros `n` bytes de la direccion apuntada por `s` con la contante `c`.
+`void *memset(void s[.n], int c, size_t n);` llena los primeros `n` bytes de la direccion apuntada por `s` con la constante `c`.
  
 `int sigaction(int signum, const struct sigaction *_Nullable restrict act, struct sigaction *_Nullable restrict oldact);` registra el manejador `act` para la señal `signum`. 
  
@@ -132,7 +132,7 @@ Este bloque hace que el hilo principal duerma por 777 milisegundos, luego desact
   pthread_join(t, NULL)
 ```
 
-En resumen `uc=13` siempre y `ac=777000000/1000/7000=111` aproximadamente. 
+En resumen `uc=13` siempre y `ac=11` aproximadamente. 
 
 Bueno, deberia ser asi pero en mis pruebas era `ac=0` siempre. Una posible explicacion puede ser [esta](https://stackoverflow.com/questions/64217976/sigalrm-in-c-does-not-executing-in-the-handler).
 
