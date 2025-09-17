@@ -1,5 +1,4 @@
 // npm install minecraft-protocol
-// npm install mineflayer
 // node walker.js
 
 const mc = require('minecraft-protocol')
@@ -8,25 +7,12 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   terminal: false,
-  prompt: 'Enter a message> \n'
+  prompt: 'Enter a message> '
 })
 
 var entityId = 0
 var nextPosition = { 'x': 100, 'y': 100, 'z': 100 }
 let walkInterval = null
-
-function teleport(x, y, z) {
-  console.log(`Sending teleport to: ${x}, ${y}, ${z}`)
-
-  client.write('position_look', {
-    x: x,
-    y: y,
-    z: z,
-    yaw: 0,
-    pitch: 0,
-    onGround: true
-  })
-}
 
 const [,, host, port, username] = process.argv
 if (!host || !port) {
@@ -62,7 +48,9 @@ client.on('connect', () => {
   const ChatMessage = require('prismarine-chat')(client.version)
 
   console.log('Connected to server')
-  rl.prompt()
+  setTimeout(() => {
+    rl.prompt()
+   }, 2500);
 
   client.on('playerChat', function ({ senderName, plainMessage, unsignedContent, formattedMessage, verified }) {
     let content
@@ -105,7 +93,7 @@ rl.on('line', function (line) {
       if (nextPosition.x != 69400) { nextPosition.x += 100 }
       else if (nextPosition.y != 69400) { nextPosition.y += 100 }
       else if (nextPosition.z != 69400) { nextPosition.z += 100 }
-      console.log("[*] Walking to:", JSON.stringify(nextPosition)) 
+      console.log(`[CLIENT] Set Player Position and Rotation: ${nextPosition.x}, ${nextPosition.y}, ${nextPosition.z}`)
       client.write('position_look', {
         x: nextPosition.x,
         y: nextPosition.y,
@@ -126,12 +114,13 @@ rl.on('line', function (line) {
       })
 
       console.log("[*] The bot has arrived!")
-      
-      if (!client.chat) {
-       queuedChatMessages.push("!flag")
-      } else {
-        client.chat("!flag")
-      }
+      setTimeout(() => {
+       if (!client.chat) {
+        queuedChatMessages.push("!flag")
+       } else {
+         client.chat("!flag")
+       }
+      }, 1000);
       clearInterval(walkInterval)
       walkInterval = null
     }
@@ -148,18 +137,21 @@ rl.on('line', function (line) {
 client.on('packet', (data, meta) => {
   if (meta.name === 'login' && data.entityId) {
     entityId = data.entityId
-    console.log('[*] Login success. Entity ID:', entityId)
+    console.log('[*] Login success')
   }
 })
 
 client.on('spawn_position', (packet) => {
-  console.log("[*] Spawn position")
-  console.log(packet)
+  console.log("[SERVER] Spawn Entity: ")
+  console.log(packet,"\n")
 })
 
 client.on('position', (packet) => {
-  console.log("[*] Server wants me in position: " + JSON.stringify(packet))
+  console.log("[SERVER] Synchronize Player Position: ")
+  console.log(packet,"\n")
   // 1) Confirm teleport
+  packet = {teleportId: packet.teleportId}
+  console.log("[CLIENT] Confirm Teleportation:\n",packet,"\n")
   client.write('teleport_confirm', {
     teleportId: packet.teleportId
   })
@@ -172,7 +164,5 @@ client.on('position', (packet) => {
     pitch: packet.pitch,
     onGround: true
   })
-
-  console.log("[*] nextPosition: " + JSON.stringify(nextPosition))
 })
 
