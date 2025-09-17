@@ -2,7 +2,7 @@
 
 El programa recibe un archivo tar en octal, extrae su contenido en `/uploads` y luegoe ejecuta la funcion `run` en `/uploads/plugin.py` si existe el fichero.
 
-Podemos crear un script para que cree un archivo de texto en octal del tar con la carga util:
+Podemos crear un script para que genere un archivo de texto en octal del tar con la carga util:
 ``` py
 import os
 
