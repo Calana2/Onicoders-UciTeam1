@@ -47,11 +47,11 @@ En `game/chat.go`:
 
 Nos dan la flag si escribimos `!flag` en el chat y nuestro jugador esta en las coordenadas `{ 69420 , 69420 , 69420 }`.
 
-En retos parecidos suelen decir que no es necesario instalar Minecraft para conectarse y es cierto,en mi caso use `nodejs` y el modulo `minecraft-protocol`, aunqie creo que ademas con `mineflayer` pudo haber sido mas facil).
+En retos parecidos suelen decir que no es necesario instalar Minecraft para conectarse y es cierto,en mi caso use `nodejs` y el modulo `minecraft-protocol`, aunque creo que ademas con `mineflayer` pudo haber sido mas facil.
 
 En el repositorio de `minecraft-protocol` encontre un [bot basico para interactar con el chat](https://github.com/PrismarineJS/node-minecraft-protocol/blob/master/examples/client_chat/client_chat.js) y lo modifique un poco.
 
-Estuve revisando en `node_modules/minecraft-protocol/` los eventos con `grep -REi "client\.on\('" *` y leyendo sobre el protocolo en https://minecraft.wiki/w/Minecraft_Wiki:Protocol_documentation
+Estuve revisando en `node_modules/minecraft-protocol/` los eventos y leyendo sobre el protocolo en https://minecraft.wiki/w/Minecraft_Wiki:Protocol_documentation
 
 ## Paquetes del protocolo de Minecraft (Basico)
 
