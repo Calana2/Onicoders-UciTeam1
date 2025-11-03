@@ -8,7 +8,7 @@
 
 🇨🇺 **CTFtime Cuba Rank:** #1
 
-👑 **Global Rank:** #628
+👑 **Global Rank:** #636
 
 ⭐ **Rating Points:** 79.25
 
