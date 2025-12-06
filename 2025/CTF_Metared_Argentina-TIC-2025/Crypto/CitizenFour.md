@@ -1,0 +1,47 @@
+# Citizen Four
+
+Extraemos de la captura los certificados con `Wireshark`:
+
+<img width="1347" height="696" alt="2025-12-06-115432_1347x696_scrot" src="https://github.com/user-attachments/assets/61eca25a-43ce-42ce-aa5f-1635eb4128d1" />
+
+Con `openssl` obtenemos los módulos:
+```
+openssl x509 -inform DER -in cert1.der -text -noout --modulus
+openssl x509 -inform DER -in cert2.der -text -noout --modulus
+openssl x509 -inform DER -in cert3.der -text -noout --modulus
+```
+
+Con esos módulos hallamos factores común para encontrar `p` o `q`:
+```py
+import math
+n1 = int("""BA06498CC91A60CE105D5C151E640BE8B5DB07CC25FBE4B75CC797D537606B17CB1965D36B31C1BD5F75BE10C9FC13495A8EC645BA2BFFFE23BE3C648CD7413A29D61BC279F5BEDAA1899E37F8C46E359E68905DB75E804FDC3DD77A2C61816B042390F736EDE02D596D123C9A863D0740D92F056666655AE394FBE26E967596E52536C2201433EB512C0D0422FE2AA8200D84C17D68E925B66455AB5BF2B4A235C831DB243B08E005DADC1DAC9C64CBB94FFBDED0B4619CAF90616242B0EF98EB1CB77969B37E922A411CD01733C832C62A7E7132A316B09E8B56E51600F85DC381C9A0AD41AD142E60F49EEA119ED94E00933D34CC4BFCECC253A7A06EDB8D""",16)
+
+n2 = int("""CDA3D8C1BCADA401AA27929FBE13CFF85A56DE84F42DAFD2882E6EFEF2B7DED285B1630486136AA13653C3AF389B575DC0FB1F669791FE9949D0E7E9601AB3F2738AAC4F30A942B8FD69B96CB42698393702236B0D94F1D7C982C5427004C7B46E74D90E27E1EA5F79B9C3AEA6D0E6CA89D2BC4E548CD4C3E625FA7CEDD2F978246D5EF5727B7D8125E63EBF22E0FB83F4DC8385C5E51B46BD2626CBA55DB2AF30E79BEE6E09CE4981402358D73E5B5F2FEDC13AC236EA09ACC79B1A443C9FB5C7298EEEC27A40180556B6FF7238ED35A22668D09E4F9DED4DE67BFA03A2E5C588299AD4CBC16317FB3F9D6FE1C84E0C7E058D15387A162145C989199C766DE3""",16)
+
+
+p = math.gcd(n1,n2)
+q = n1 // p
+n = p*q
+assert(p * q == n1)
+e = 65537
+
+from Crypto.PublicKey import RSA
+from Crypto.Util.number import inverse
+phi = (p - 1) * (q - 1)
+d = inverse(e, phi)
+key = RSA.construct((n, e, d, p, q))
+print(key.export_key().decode())
+```
+
+`python3 s.py > cert.pem`
+
+Cargamos la clave privada generada en `Wireshark` (Edit/Preferences/Protocols/TLS/RSA keys list/Edit)
+
+<img width="1364" height="726" alt="2025-12-06-114008_1364x726_scrot" src="https://github.com/user-attachments/assets/019b58f7-6cda-4491-9af1-6801e1bb40b2" />
+
+Seguimos el flujo TLS entre `172.18.0.1` y `172.18.0.2` y encontramos la flag:
+
+<img width="1366" height="725" alt="2025-12-06-113943_1366x725_scrot" src="https://github.com/user-attachments/assets/aadbecd3-0fad-45bb-8569-20c09c005e09" />
+
+`UNLP{Assume-your4dversary1sCapabl3of0neTrillionGuessesPer5econd}`
+
