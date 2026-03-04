@@ -12,6 +12,7 @@
 
 ⭐ **Rating Points:** 85.54
 
+## Onicoders-UciTeam1
 ### 2024
 - [JNIC Sevilla 2024](https://github.com/Calana2/CTF_Writeups/tree/main/2024/JNIC2024)
 - [JCE UCI 2024](https://github.com/Calana2/CTF_Writeups/tree/main/2024/CTF_JCE2024_UCI)
@@ -39,4 +40,11 @@
 - [CTF@AC_Quals_2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/CTF%40AC_Quals_2025)
 - [USV_CTF_2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/USV_CTF_2025)
 - [Metared Argentina TIC 2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/CTF_Metared_Argentina-TIC-2025)
+
+
+## H3x3cut10n3r5
+### 2025
+- [Ctrl+Space_CTF_2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/Ctrl%2BSpace_CTF_2025/)
+- [QnQSec_CTF_2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/QnQSec_CTF_2025)
+- [Sunshine_CTF_2025](https://github.com/Calana2/Onicoders-UciTeam1/tree/main/2025/Sunshine_CTF_2025)
 
